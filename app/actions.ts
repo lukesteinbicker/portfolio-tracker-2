@@ -54,6 +54,22 @@ async function getCurrentPrice(symbol: string): Promise<number> {
   return Number(data.results[0].c);
 }
 
+export const getHolding = async(id: string) => {
+  const supabase = await createClient();
+  const { data: holding, error } = await supabase
+    .from('holdings')
+    .select('id, symbol, purchase_price, shares_owned')
+    .eq('id', id)
+    .single()
+
+  if (error || holding == null) {
+    return null;
+  }
+
+  return holding;
+
+}
+
 export const getHoldings = async() => {
   const supabase = await createClient();
   const { data: holdings, error } = await supabase
@@ -108,7 +124,6 @@ export const getHoldingChart = async(id: string, timeframe: "day" | "week" | "mo
       return [];
     }
     const data = await response.json();
-    console.log(data)
     return data.results;
 }
 
@@ -121,9 +136,17 @@ interface HoldingFormValues {
 
 export const addHolding = async(values: HoldingFormValues) => {
   const supabase = await createClient();
-  const { error } = await supabase
+  const { data, error } = await supabase
   .from('holdings')
-  .insert({ symbol: values.symbol, purchase_price: values.price, shares_owned: values.shares })
+  .upsert(
+    { 
+      symbol: values.symbol,
+      purchase_price: values.price,
+      shares_owned: values.shares,
+      date: values.date
+    }, 
+    { onConflict: 'symbol' }
+  )
   .select()
 
   if (error) {

@@ -8,23 +8,23 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog"
-import { Plus } from "lucide-react"
+import { Pen } from "lucide-react"
 import { HoldingForm } from "./holding-form"
 
-export function CreateHolding() {
+export function EditHolding({id} : {id: string}) {
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button variant="outline"><Plus/></Button>
+        <Button variant="outline"><Pen/></Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[600px]">
         <DialogHeader>
-          <DialogTitle>Create holding</DialogTitle>
+          <DialogTitle>Edit holding</DialogTitle>
           <DialogDescription>
             Enter relevant information below
           </DialogDescription>
         </DialogHeader>
-        <HoldingForm id={null}/>
+        <HoldingForm id={id} />
       </DialogContent>
     </Dialog>
   )

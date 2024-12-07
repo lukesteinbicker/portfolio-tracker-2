@@ -2,13 +2,9 @@ import HeaderAuth from "@/components/header-auth";
 import { ThemeSwitcher } from "@/components/theme-switcher";
 import { GeistSans } from "geist/font/sans";
 import { ThemeProvider } from "next-themes";
-import '@mantine/dates/styles.css';
-import '@mantine/core/styles.css';
 import Link from "next/link";
 import "./globals.css";
-import { MantineProvider } from '@mantine/core';
 import { Toaster } from "@/components/ui/toaster";
-
 
 const defaultUrl = process.env.URL
   ? `https://${process.env.URL}`
@@ -20,7 +16,7 @@ export const metadata = {
   description: "Beta",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: {
   children: React.ReactNode;
@@ -34,7 +30,6 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          <MantineProvider>
           <main className="min-h-screen flex flex-col items-center">
             <div className="flex-1 w-full flex flex-col items-center">
               <nav className="w-full flex justify-center border-b border-b-foreground/10 h-16">
@@ -42,6 +37,7 @@ export default function RootLayout({
                   <div className="flex items-center font-semibold">
                     <Link href={"/"}><div className="text-3xl mr-4">🐮 MII</div></Link>
                   </div>
+                  <h3 className="text-sm text-muted-foreground">Demo</h3>
                   <div className="inline-flex gap-2">
                   <HeaderAuth />
                   <ThemeSwitcher />
@@ -54,7 +50,6 @@ export default function RootLayout({
             </div>
           </main>
           <Toaster />
-          </MantineProvider>
         </ThemeProvider>
       </body>
     </html>

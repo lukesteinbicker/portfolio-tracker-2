@@ -19,7 +19,10 @@ export default async function ProtectedPage() {
   return (
     <div className="flex-1 w-full flex flex-col gap-12 my-10 px-4">
       <div className="flex items-center justify-between mx-auto w-full">
-        <h1 className="text-4xl">Current portfolio</h1>
+        <div>
+        <h1 className="text-4xl">Portfolio</h1>
+        <h3 className="text-sm text-muted-foreground">API calls are limited to 5 per minute. Contact lukesteinbicker@gmail.com for full access.</h3>
+        </div>
         <CreateHolding />
       </div>
       <div className="mx-auto w-full">

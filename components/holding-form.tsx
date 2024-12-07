@@ -1,11 +1,7 @@
 "use client"
-
-import { useState } from "react"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
-import { DatePicker, DateTimePicker } from '@mantine/dates'
-import { Autocomplete, Grid, Input } from '@mantine/core'
 import amextickers from './data/amex_tickers.json'
 import nysetickers from './data/nyse_tickers.json'
 import nasdaqtickers from './data/nasdaq_tickers.json'
@@ -28,26 +24,33 @@ import {
   FormMessage,
 } from "@/components/ui/form"
 import { SubmitButton } from "./submit-button"
-import { addHolding } from "@/app/actions"
+import { addHolding, getHolding } from "@/app/actions"
 import { toast } from "./hooks/use-toast"
+import { useState } from "react"; 
+import Datepicker from "react-tailwindcss-datepicker"; 
+import { Input } from "./ui/input"
 
 const formSchema = z.object({
   exchange: z.enum(["nyse", "nasdaq", "amex"], {
-    required_error: "Exchange name is required"
+    required_error: "Field empty"
   }),
   symbol: z.string().min(1, {
-    message: "Symbol name is required.",
+    message: "Field empty",
   }),
   date: z.date({
-    required_error: "Please select a date.",
+    required_error: "Field empty",
   }),
   price: z.coerce.number({
-    required_error: "Please enter a price.",
-    invalid_type_error: "Price must be a number.",
+    required_error: "Field empty",
+    invalid_type_error: "Invalid value",
+  }).nonnegative({
+    message: "Negative value"
   }),
   shares: z.coerce.number({
-    required_error: "Please enter the number of shares.",
-    invalid_type_error: "Number of shares must be a number.",
+    required_error: "Empty",
+    invalid_type_error: "Invalid value",
+  }).nonnegative({
+    message: "Negative value"
   }),
 })
 
@@ -59,22 +62,42 @@ interface HoldingFormValues {
   shares: number;
 }
 
-export function HoldingForm() {
+export function HoldingForm({id} : {id: string | null}) {
   const [symbol, setSymbol] = useState("")
   const [tickers, setTickers] = useState(nysetickers)
-  const [value, setValue] = useState<Date | null>(null);
+  const [value, setValue] = useState<{
+    startDate: Date | null;
+    endDate: Date | null;
+  }>({
+    startDate: new Date(),
+    endDate: new Date()
+  });
 
-  const form = useForm({
+  const form = useForm<HoldingFormValues>({
     resolver: zodResolver(formSchema),
-    defaultValues: {
-      exchange: "nyse" as const,
-      symbol: "",
-      date: new Date(),
-      price: 0,
-      shares: 0,
-    },
+    defaultValues: async () => {
+      if (id) {
+        const holding = await getHolding(id)
+        if (holding != null) {
+          return {
+            exchange: "nyse",
+            symbol: holding.symbol,
+            date: new Date(),
+            price: holding.purchase_price,
+            shares: holding.shares_owned,
+          }
+        }
+      }
+      return {
+        exchange: "nyse",
+        symbol: "",
+        date: new Date(),
+        price: 0,
+        shares: 0,
+      }
+    }
   })
-
+  
   async function onSubmit(values: HoldingFormValues) {
     try {
       const response = await addHolding(values)
@@ -90,137 +113,134 @@ export function HoldingForm() {
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-        <Grid>
-          <Grid.Col span={{ base: 12, lg: 6 }}>
-          <div className="flex mb-4">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          <div className="col-span-1">
+            <div className="flex mb-4">
               <div className="flex-1 pr-2">
-              <FormField
-                control={form.control}
-                name="exchange"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className="whitespace-nowrap overflow-hidden text-ellipsis">Exchange</FormLabel>
-                    <Select
-                      onValueChange={(value: "nyse" | "nasdaq" | "amex") => {
-                        field.onChange(value);
-                        setTickers(
-                          value === "nyse" 
-                            ? nysetickers 
-                            : value === "nasdaq" 
-                              ? nasdaqtickers 
-                              : amextickers
-                        );
-                      }}
-                      defaultValue={field.value}
-                    >
-                      <SelectTrigger>
-                        <SelectValue placeholder="Choose" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectGroup>
-                          <SelectLabel>Exchange</SelectLabel>
-                          <SelectItem value="nyse">NYSE</SelectItem>
-                          <SelectItem value="nasdaq">Nasdaq</SelectItem>
-                          <SelectItem value="amex">AMEX</SelectItem>
-                        </SelectGroup>
-                      </SelectContent>
-                    </Select>
-                  </FormItem>
-                )}
-              />
-            </div>
-            <div className="flex-1 pr-2">
-              <FormField
-                control={form.control}
-                name="symbol"
-                render={({ field }) => (
-                  <FormItem className="flex-1">
-                    <FormLabel className="whitespace-nowrap overflow-hidden text-ellipsis">Stock Symbol</FormLabel>
-                    <FormControl>
-                      <Autocomplete
-                        value={field.value}
-                        onChange={(value) => {
-                          field.onChange(value)
-                          setSymbol(value)
+                <FormField
+                  control={form.control}
+                  name="exchange"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="whitespace-nowrap overflow-hidden text-ellipsis">Exchange</FormLabel>
+                      <Select
+                        onValueChange={(value: "nyse" | "nasdaq" | "amex") => {
+                          field.onChange(value);
+                          setTickers(
+                            value === "nyse" 
+                              ? nysetickers 
+                              : value === "nasdaq" 
+                                ? nasdaqtickers 
+                                : amextickers
+                          );
                         }}
-                        data={tickers}
-                        placeholder="Search"
-                        limit={5}
-                        comboboxProps={{ withinPortal: false }}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+                        defaultValue={field.value}
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="Choose" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectGroup>
+                            <SelectItem value="nyse">NYSE</SelectItem>
+                            <SelectItem value="nasdaq">Nasdaq</SelectItem>
+                            <SelectItem value="amex">AMEX</SelectItem>
+                          </SelectGroup>
+                        </SelectContent>
+                      </Select>
+                    </FormItem>
+                  )}
+                />
+              </div>
+              <div className="flex-1 pr-2">
+                <FormField
+                  control={form.control}
+                  name="symbol"
+                  render={({ field }) => (
+                    <FormItem className="flex-1">
+                      <FormLabel className="whitespace-nowrap overflow-hidden text-ellipsis">Stock Symbol</FormLabel>
+                      <FormControl>
+                      <Input
+                          type="text"
+                          disabled={id !== null}
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
               </div>
             </div>
   
             <div className="flex mb-4">
-          <div className="flex-1 pr-2">
-              <FormField
-                control={form.control}
-                name="price"
-                render={({ field }) => (
-                  <FormItem className="flex-1">
-                    <FormLabel className="whitespace-nowrap overflow-hidden text-ellipsis">Total purchase price</FormLabel>
-                    <FormControl>
-                      <Input
-                        type="number"
-                        placeholder="0.00"
-                        disabled={symbol==""}
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+              <div className="flex-1 pr-2">
+                <FormField
+                  control={form.control}
+                  name="price"
+                  render={({ field }) => (
+                    <FormItem className="flex-1">
+                      <FormLabel className="whitespace-nowrap overflow-hidden text-ellipsis">Total purchase price</FormLabel>
+                      <FormControl>
+                        <Input
+                          type="number"
+                          placeholder="0.00"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
               </div>
               <div className="flex-1 pr-2">
-              <FormField
-                control={form.control}
-                name="shares"
-                render={({ field }) => (
-                  <FormItem className="flex-1">
-                    <FormLabel className="whitespace-nowrap overflow-hidden text-ellipsis">Number of Shares</FormLabel>
-                    <FormControl>
-                      <Input
-                        type="number"
-                        placeholder="0"
-                        disabled={symbol==""}
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+                <FormField
+                  control={form.control}
+                  name="shares"
+                  render={({ field }) => (
+                    <FormItem className="flex-1">
+                      <FormLabel className="whitespace-nowrap overflow-hidden text-ellipsis">Number of Shares</FormLabel>
+                      <FormControl>
+                        <Input
+                          type="number"
+                          placeholder="0"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
             </div>
-            </div>
-          </Grid.Col>
+          </div>
   
-          <Grid.Col span={{ base: 12, lg: 6 }}>
-            <FormField
-              control={form.control}
-              name="date"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="whitespace-nowrap overflow-hidden text-ellipsis">Transaction Date</FormLabel>
-                  <FormControl>
-                    <DatePicker
-                    {...field}
-                      value={value}
-                      onChange={setValue}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          </Grid.Col>
-        </Grid>
-        <SubmitButton disabled={symbol==""}>Submit</SubmitButton>
+          <div className="col-span-1">
+          <FormField
+  control={form.control}
+  name="date"
+  render={({ field }) => (
+    <FormItem>
+      <FormLabel className="whitespace-nowrap overflow-hidden text-ellipsis">
+        Transaction Date
+      </FormLabel>
+      <FormControl>         
+        <Datepicker 
+          asSingle={true}
+          value={value}
+          onChange={newValue => {
+            setValue(newValue || { startDate: null, endDate: null });
+            field.onChange(newValue?.startDate);
+          }}
+          useRange={false}
+        /> 
+      </FormControl>
+      <FormMessage />
+    </FormItem>
+  )}
+/>
+          </div>
+        </div>
+        <SubmitButton>Submit</SubmitButton>
       </form>
     </Form>
   )

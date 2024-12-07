@@ -7,9 +7,6 @@
   },
   "dependencies": {
     "@hookform/resolvers": "^3.9.0",
-    "@mantine/core": "^7.13.3",
-    "@mantine/dates": "^7.13.3",
-    "@mantine/hooks": "^7.13.3",
     "@radix-ui/react-aspect-ratio": "^1.1.0",
     "@radix-ui/react-checkbox": "^1.1.1",
     "@radix-ui/react-dialog": "^1.1.2",
@@ -31,14 +28,14 @@
     "framer-motion": "^11.11.9",
     "geist": "^1.2.1",
     "lucide-react": "^0.436.0",
-    "next": "latest",
+    "next": "^14.2.20",
     "next-themes": "^0.3.0",
     "prettier": "^3.3.3",
-    "react": "19.0.0-rc.1",
-    "react-dom": "19.0.0-rc.1",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
     "react-hook-form": "^7.53.1",
+    "react-tailwindcss-datepicker": "^1.7.2",
     "recharts": "^2.13.3",
-    "use-debounce": "^10.0.4",
     "zod": "^3.23.8"
   },
   "devDependencies": {
@@ -53,8 +50,5 @@
     "tailwindcss": "3.4.1",
     "tailwindcss-animate": "^1.0.7",
     "typescript": "5.3.3"
-  },
-  "overrides": {
-  "react-is": "^19.0.0-rc.1"
-}
+  }
 }

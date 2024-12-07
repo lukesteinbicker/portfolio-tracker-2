@@ -34,7 +34,7 @@ export function StockChart({ id }: { id: string }) {
             const results = await getHoldingChart(id, timeframe);
 if (results) {
     const chartData = results.map((point: any, index: number) => ({
-        timestamp: index % 4 === 0 ? dayjs(point.t).format(
+        timestamp: index % 1 === 0 ? dayjs(point.t).format(
             timeframe === "day" ? "HH:mm" : 
             timeframe === "year" ? "MMM" : 
             "MM/DD"
@@ -75,13 +75,13 @@ if (results) {
                 <ChartContainer config={chartConfig}>
                     <LineChart data={data}>
                         <XAxis dataKey="timestamp" />
-                        <YAxis dataKey="value" />
+                        <YAxis dataKey="value" domain={['auto', 'auto']} />
                         <Tooltip />
                         <CartesianGrid strokeDasharray="3 3" />
                         <Line 
                             type="monotone" 
                             dataKey="value" 
-                            stroke="#22c55e" 
+                            stroke="#3B82F6" 
                             dot={false}
                         />
                     </LineChart>

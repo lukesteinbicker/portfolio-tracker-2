@@ -40,9 +40,10 @@ export default function Treemap ({ data, className = "", onItemClick }: TreemapP
     return 0;
   };
 
-  const colorScale = d3.scaleLinear<string>()
-  .domain([-50, 0, 50])
-  .range(["#ef4444", "#e2e8f0", "#22c55e"])
+  const colorScale = d3.scalePow<string>()
+  .exponent(0.3)
+  .domain([-25, 0, 25])
+  .range(["#dc2626", "#e2e8f0", "#16a34a"])
   .clamp(true);
 
   const allShapes = root.leaves().map((leaf, i) => {

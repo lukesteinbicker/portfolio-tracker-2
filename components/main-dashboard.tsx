@@ -2,9 +2,10 @@
 
 import React, { useState } from 'react';
 import Treemap from '@/components/ui/treemap';
-import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { DeleteHolding } from './delete-holding';
 import { StockChart } from './stock-chart';
+import { EditHolding } from './edit-holding';
 
 type SelectedItem = {
   name: string;
@@ -32,7 +33,7 @@ export default function MainDashboard({initialData} : {initialData: any}) {
     <CardHeader>
       <div className="inline-flex items-center justify-between">
         <CardTitle>{selectedItem ? selectedItem.name : 'No item selected'}</CardTitle>
-        {selectedItem ? <DeleteHolding id={selectedItem.id}/> : <></>}
+        {selectedItem ? <div className="inline-flex items-center gap-2"><EditHolding id={selectedItem.id} /><DeleteHolding id={selectedItem.id}/></div> : <></>}
       </div>
     </CardHeader>
     <CardContent>
@@ -42,7 +43,7 @@ export default function MainDashboard({initialData} : {initialData: any}) {
         <StockChart id={selectedItem.id} />
         </div>
       ) : (
-        <p>Select an item from the treemap above to view its details.</p>
+        <p>Select an item to view its details.</p>
       )}
     </CardContent>
   </Card>
