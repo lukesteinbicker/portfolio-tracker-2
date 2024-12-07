@@ -1,8 +1,8 @@
 import { createServerClient } from "@supabase/ssr";
-import { cookies, type UnsafeUnwrappedCookies } from "next/headers";
+import { cookies } from "next/headers";
 
 export const createClient = async() => {
-  const cookieStore = (await cookies() as unknown as UnsafeUnwrappedCookies);
+  const cookieStore = (await cookies() as any);
 
   return createServerClient(
     process.env.SUPABASE_URL!,

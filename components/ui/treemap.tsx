@@ -1,6 +1,6 @@
 import * as d3 from "d3";
 
-export type TreeNode = {
+type TreeNode = {
   type: 'node';
   value: number;
   name: string;
@@ -16,7 +16,7 @@ type TreeLeaf = {
     shares_owned: number;
   };
 
-export type Tree = TreeNode | TreeLeaf;
+type Tree = TreeNode | TreeLeaf;
 
 type TreemapProps = {
   data: Tree;

@@ -1,4 +1,4 @@
-"use server";
+"use server"
 
 import { encodedRedirect } from "@/utils/utils";
 import { createClient } from "@/utils/supabase/server";
