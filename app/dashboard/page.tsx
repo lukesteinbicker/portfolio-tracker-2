@@ -17,7 +17,7 @@ export default async function ProtectedPage() {
   }
 
   return (
-    <div className="flex-1 w-full flex flex-col gap-12 my-10 px-4">
+    <div className="flex-1 w-full flex flex-col gap-6 my-10 px-4">
       <div className="flex items-center justify-between mx-auto w-full">
         <div>
         <h1 className="text-4xl">Portfolio</h1>

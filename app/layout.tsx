@@ -44,7 +44,7 @@ export default async function RootLayout({
                   </div>
                 </div>
               </nav>
-              <div className="flex flex-col w-full px-5">
+              <div className="flex flex-col w-full px-5 items-center">
                 {children}
               </div>
             </div>

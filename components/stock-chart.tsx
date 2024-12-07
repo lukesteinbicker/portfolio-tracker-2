@@ -50,15 +50,13 @@ if (results) {
 
     return (
         <div>
-            <div className="flex justify-between items-center w-full mb-4">
-                <h1 className="text-nowrap pr-36">Show chart &rarr;</h1>
                 <Select
                     onValueChange={(value: "day" | "week" | "month" | "year") => {
                         setTimeframe(value);
                     }}
                 >
                     <SelectTrigger>
-                        <SelectValue placeholder="Timeframe" />
+                        <SelectValue placeholder="Show chart" />
                     </SelectTrigger>
                     <SelectContent>
                         <SelectGroup>
@@ -69,7 +67,6 @@ if (results) {
                         </SelectGroup>
                     </SelectContent>
                 </Select>
-            </div>
             {timeframe && data.length > 0 && (
             <div className="w-full">
                 <ChartContainer config={chartConfig}>
