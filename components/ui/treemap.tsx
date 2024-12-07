@@ -26,10 +26,11 @@ type TreemapProps = {
 
 export default function Treemap ({ data, className = "", onItemClick }: TreemapProps) {
   const hierarchy = d3.hierarchy(data).sum((d) => d.value);
+  const totalValue = hierarchy.value || 1; // Prevent division by zero
 
   const treeGenerator = d3.treemap<Tree>()
-    .size([100, 100])
-    .padding(1.5);
+  .size([100, 100])
+  .padding(0.8);
 
   const root = treeGenerator(hierarchy);
 
@@ -40,68 +41,74 @@ export default function Treemap ({ data, className = "", onItemClick }: TreemapP
     return 0;
   };
 
+  const getPercentOfPortfolio = (value: number) => {
+    return (value / totalValue) * 100;
+  };
+
   const colorScale = d3.scalePow<string>()
-  .exponent(0.3)
-  .domain([-25, 0, 25])
-  .range(["#dc2626", "#e2e8f0", "#16a34a"])
-  .clamp(true);
+    .exponent(0.3)
+    .domain([-25, 0, 25])
+    .range(["#dc2626", "#e2e8f0", "#16a34a"])
+    .clamp(true);
 
   const allShapes = root.leaves().map((leaf, i) => {
     const leafData = leaf.data as TreeLeaf;
     const width = leaf.x1 - leaf.x0;
     const height = leaf.y1 - leaf.y0;
     
-    const fontSize = Math.min(width, height) * 0.15;
+    const fontSize = Math.min(width, height) * 0.25;
+    const percentShare = getPercentOfPortfolio(leafData.value);
 
     return (
       <g 
-    key={leafData.id}
-    onClick={() => onItemClick({
-      id: leafData.id,
-      name: leafData.name,
-      value: leafData.value,
-      purchase_price: leafData.purchase_price,
-      shares_owned: leafData.shares_owned
-    })}
-    className="cursor-pointer"
+        key={leafData.id}
+        onClick={() => onItemClick({
+          id: leafData.id,
+          name: leafData.name,
+          value: leafData.value,
+          purchase_price: leafData.purchase_price,
+          shares_owned: leafData.shares_owned
+        })}
+        className="cursor-pointer"
+      >
+        <defs>
+          <linearGradient id={`gradient-${leafData.id}`} x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stopColor={colorScale(getPercentChange(leaf))} stopOpacity="1"/>
+            <stop offset="100%" stopColor={colorScale(getPercentChange(leaf))} stopOpacity="0.8"/>
+          </linearGradient>
+        </defs>
+        <rect
+          x={`${leaf.x0}%`}
+          y={`${leaf.y0}%`}
+          width={`${width}%`}
+          height={`${height}%`}
+          stroke="currentColor"
+          strokeWidth="0.2"
+          fill={`url(#gradient-${leafData.id})`}
+          className="opacity-90 hover:opacity-100 transition-opacity duration-200"
+        />
+        <text
+  x={`${leaf.x0 + width/2}%`}
+  y={`${leaf.y0 + height/2}%`}
+  textAnchor="middle"
+  fill="currentColor"
+  className="pointer-events-none"
+>
+  <tspan
+    fontSize={`${fontSize * 3.5}%`}
+    className="font-bold"
   >
-    <defs>
-      <linearGradient id={`gradient-${leafData.id}`} x1="0" y1="0" x2="0" y2="1">
-        <stop offset="0%" stopColor={colorScale(getPercentChange(leaf))} stopOpacity="1"/>
-        <stop offset="100%" stopColor={colorScale(getPercentChange(leaf))} stopOpacity="0.8"/>
-      </linearGradient>
-    </defs>
-    <rect
-      x={`${leaf.x0}%`}
-      y={`${leaf.y0}%`}
-      width={`${width}%`}
-      height={`${height}%`}
-      stroke="currentColor"
-      strokeWidth="0.2"
-      fill={`url(#gradient-${leafData.id})`}
-      className="opacity-90 hover:opacity-100 transition-opacity duration-200"
-    />
-    <text
-      x={`${leaf.x0 + width/2}%`}
-      y={`${leaf.y0 + height/2 - fontSize * 1.2}%`}
-      fontSize={`${fontSize * 2.5}%`}
-      textAnchor="middle"
-      fill="currentColor"
-      className="font-bold pointer-events-none"
-    >
-      {leaf.data.name}
-    </text>
-    <text
-      x={`${leaf.x0 + width/2}%`}
-      y={`${leaf.y0 + height/2 + fontSize * 0.8}%`}
-      fontSize={`${fontSize * 2}%`}
-      textAnchor="middle"
-      fill="currentColor"
-      className="pointer-events-none"
-    >
-      ${leaf.data.value.toLocaleString()}
-    </text>
-  </g>
+    {leaf.data.name}
+  </tspan>
+  <tspan
+    fontSize={`${fontSize * 2.8}%`}
+    className="font-normal"
+    dx="0.3em"
+  >
+    {`${percentShare.toFixed(1)}%`}
+  </tspan>
+</text>
+      </g>
     );
   });
 

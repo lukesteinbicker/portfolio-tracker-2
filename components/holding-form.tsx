@@ -29,6 +29,9 @@ import { toast } from "./hooks/use-toast"
 import { useState } from "react"; 
 import Datepicker from "react-tailwindcss-datepicker"; 
 import { Input } from "./ui/input"
+import amex from "./data/amex_tickers.json"
+import nasdaq from "./data/nasdaq_tickers.json"
+import nyse from "./data/nyse_tickers.json"
 
 const formSchema = z.object({
   exchange: z.enum(["nyse", "nasdaq", "amex"], {
@@ -79,8 +82,17 @@ export function HoldingForm({id} : {id: string | null}) {
       if (id) {
         const holding = await getHolding(id)
         if (holding != null) {
+          let exchange: "nyse" | "nasdaq" | "amex" = "nyse"
+          if (amex.includes(holding.symbol)) {
+            exchange = "amex"
+          } else if (nasdaq.includes(holding.symbol)) {
+            exchange = "nasdaq"
+          } else if (nyse.includes(holding.symbol)) {
+            exchange = "nyse"
+          }
+  
           return {
-            exchange: "nyse",
+            exchange,
             symbol: holding.symbol,
             date: new Date(),
             price: holding.purchase_price,
@@ -99,6 +111,33 @@ export function HoldingForm({id} : {id: string | null}) {
   })
   
   async function onSubmit(values: HoldingFormValues) {
+    if (values.exchange == "nyse") {
+      if (!nyse.includes(values.symbol)) {
+        toast({
+          title: "Error",
+          description: "Symbol not listed on NYSE"
+        })
+        return
+      }
+    }
+    if (values.exchange == "nasdaq") {
+      if (!nasdaq.includes(values.symbol)) {
+        toast({
+          title: "Error",
+          description: "Symbol not listed on Nasdaq"
+        })
+        return
+      }
+    }
+    if (values.exchange == "amex") {
+      if (!amex.includes(values.symbol)) {
+        toast({
+          title: "Error",
+          description: "Symbol not listed on AMEX"
+        })
+        return
+      }
+    }
     try {
       const response = await addHolding(values)
       toast({
@@ -124,18 +163,20 @@ export function HoldingForm({id} : {id: string | null}) {
                     <FormItem>
                       <FormLabel className="whitespace-nowrap overflow-hidden text-ellipsis">Exchange</FormLabel>
                       <Select
-                        onValueChange={(value: "nyse" | "nasdaq" | "amex") => {
-                          field.onChange(value);
-                          setTickers(
-                            value === "nyse" 
-                              ? nysetickers 
-                              : value === "nasdaq" 
-                                ? nasdaqtickers 
-                                : amextickers
-                          );
-                        }}
-                        defaultValue={field.value}
-                      >
+  onValueChange={(value: "nyse" | "nasdaq" | "amex") => {
+    field.onChange(value);
+    setTickers(
+      value === "nyse" 
+        ? nysetickers 
+        : value === "nasdaq" 
+          ? nasdaqtickers 
+          : amextickers
+    );
+  }}
+  value={field.value}
+  disabled={id !== null}
+  defaultValue={field.value}
+>
                         <SelectTrigger>
                           <SelectValue placeholder="Choose" />
                         </SelectTrigger>

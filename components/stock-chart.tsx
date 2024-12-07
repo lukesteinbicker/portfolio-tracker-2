@@ -50,6 +50,7 @@ if (results) {
 
     return (
         <div>
+            <div className="mb-2">
                 <Select
                     onValueChange={(value: "day" | "week" | "month" | "year") => {
                         setTimeframe(value);
@@ -67,6 +68,7 @@ if (results) {
                         </SelectGroup>
                     </SelectContent>
                 </Select>
+                </div>
             {timeframe && data.length > 0 && (
             <div className="w-full">
                 <ChartContainer config={chartConfig}>
