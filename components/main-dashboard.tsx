@@ -34,7 +34,16 @@ export default function MainDashboard() {
   };
 
   if (!holdingsData) {
-    return <Skeleton className="w-full lg:w-2/3 rounded-md">Loading...</Skeleton>;
+    return (
+      <div className="flex flex-col lg:flex-row w-full gap-4">
+        <div className="w-full lg:w-2/3">
+        <Skeleton className="w-full h-[500px] rounded-md" />
+        </div>
+        <div className="w-full lg:w-1/3">
+        <Skeleton className="w-full h-[500px] rounded-md" />
+        </div>
+      </div>
+    );
   }
 
   return (

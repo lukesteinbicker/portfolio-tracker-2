@@ -198,7 +198,7 @@ export function HoldingForm({id} : {id: string | null}) {
                   name="symbol"
                   render={({ field }) => (
                     <FormItem className="flex-1">
-                      <FormLabel className="whitespace-nowrap overflow-hidden text-ellipsis">Stock Symbol</FormLabel>
+                      <FormLabel className="whitespace-nowrap overflow-hidden text-ellipsis">Stock symbol</FormLabel>
                       <FormControl>
                       <Input
                           type="text"
@@ -239,7 +239,7 @@ export function HoldingForm({id} : {id: string | null}) {
                   name="shares"
                   render={({ field }) => (
                     <FormItem className="flex-1">
-                      <FormLabel className="whitespace-nowrap overflow-hidden text-ellipsis">Number of Shares</FormLabel>
+                      <FormLabel className="whitespace-nowrap overflow-hidden text-ellipsis">Number of shares</FormLabel>
                       <FormControl>
                         <Input
                           type="number"
@@ -262,7 +262,7 @@ export function HoldingForm({id} : {id: string | null}) {
   render={({ field }) => (
     <FormItem>
       <FormLabel className="whitespace-nowrap overflow-hidden text-ellipsis">
-        Transaction Date
+        Transaction date
       </FormLabel>
       <FormControl>         
         <Datepicker 
