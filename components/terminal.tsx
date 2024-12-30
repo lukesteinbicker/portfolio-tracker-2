@@ -15,20 +15,24 @@ import {
   FormMessage,
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
+import { fetchPrice, addHolding, deleteHolding, HoldingFormValues } from "@/app/actions"
+import dayjs from "dayjs"
+
  
 const formSchema = z.object({
   username: z.string()
     .regex(
-      /^(add|del)\s+(amex|nyse|nasdaq)\s+[a-zA-Z]+\s+\d+$/,
-      "Command must be in format: [add/del] [exchange] [ticker] [shares]"
+      /^(add|del)\s+[a-zA-Z]+\s+\d+$/,
+      "Command must be in format: [add/del] [ticker] [shares]"
     )
     .refine((val) => {
       const parts = val.split(/\s+/);
-      return parts.length === 4 && Number.isInteger(Number(parts[3]));
+      return parts.length === 3 && Number.isInteger(Number(parts[2]));
     }, {
-      message: "Must have exactly 4 parts and end with a valid integer"
+      message: "Must have exactly 3 parts and end with a valid integer"
     })
 });
+
 
  
 export function ProfileForm() {
@@ -40,8 +44,23 @@ export function ProfileForm() {
         },
       })
       
-      const onSubmit = (values: z.infer<typeof formSchema>) => {
-        // Handle form submission
+      const onSubmit = async (values: z.infer<typeof formSchema>) => {
+        const [action, ticker, shares] = values.username.split(" ")
+        const price = await fetchPrice(ticker)
+        const sharesNum = parseInt(shares)
+
+        if (action === "add") {
+          const holdingData: HoldingFormValues = {
+            symbol: ticker,
+            date: new Date(),
+            shares: sharesNum,
+            price: price
+          };
+          addHolding(holdingData)
+        } else if (action === "del") {
+
+        }
+
         console.log(values)
       }
  
@@ -57,7 +76,7 @@ export function ProfileForm() {
               <FormDescription>
                 Enter commands in the format:
                 <br />
-              [add/del] [exchange] [ticker] [shares]
+              [add/del] [ticker] [shares]
               </FormDescription>
               <FormControl>
                 <Input placeholder="Command" {...field} />
