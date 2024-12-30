@@ -15,15 +15,15 @@ import {
   FormMessage,
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
-import { fetchPrice, addHolding, deleteHolding, HoldingFormValues } from "@/app/actions"
-import dayjs from "dayjs"
+import { fetchPrice, addHolding, deleteHolding, HoldingFormValues, getHoldingBySymbol } from "@/app/actions"
+import { useToast } from "./hooks/use-toast"
 
  
 const formSchema = z.object({
   username: z.string()
     .regex(
-      /^(add|del)\s+[a-zA-Z]+\s+\d+$/,
-      "Command must be in format: [add/del] [ticker] [shares]"
+      /^(trade)\s+[a-zA-Z]+\s+[-]?\d+$/,
+      "Command must be in format: [trade] [ticker] [shares]"
     )
     .refine((val) => {
       const parts = val.split(/\s+/);
@@ -44,12 +44,32 @@ export function Terminal() {
         },
       })
       
+      const { toast } = useToast();
       const onSubmit = async (values: z.infer<typeof formSchema>) => {
         const [action, ticker, shares] = values.username.split(" ")
         const price = await fetchPrice(ticker)
         const sharesNum = parseInt(shares)
+        
 
-        if (action === "add") {
+        const oldHolding = await getHoldingBySymbol(ticker)
+        if (oldHolding) {
+          // Failure message and end request if user attempts to execute illegal trade
+          if (oldHolding.shares_owned + sharesNum < 0) {
+            toast({
+              title: "Failed",
+              description: "Cannot sell more shares than the amount owned.",
+            })
+            return
+          }
+          const holdingData: HoldingFormValues = {
+            symbol: ticker,
+            date: new Date(),
+            shares: sharesNum + oldHolding.shares_owned,
+            price: price
+          };
+          addHolding(holdingData)
+        }
+        else {
           const holdingData: HoldingFormValues = {
             symbol: ticker,
             date: new Date(),
@@ -57,11 +77,13 @@ export function Terminal() {
             price: price
           };
           addHolding(holdingData)
-        } else if (action === "del") {
-
         }
-
-        console.log(values)
+        
+        toast({
+          title: "Success",
+          description: "Executed trade. Refresh to update dashboard.",
+        })
+        
       }
  
   return (
@@ -76,7 +98,7 @@ export function Terminal() {
               <FormDescription>
                 Enter commands in the format:
                 <br />
-              [add/del] [ticker] [shares]
+              trade [ticker] [shares]
               </FormDescription>
               <FormControl>
                 <Input placeholder="Command" {...field} />
