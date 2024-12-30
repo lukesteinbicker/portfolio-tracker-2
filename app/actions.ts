@@ -28,7 +28,7 @@ export const signOutAction = async () => {
   return redirect("/sign-in");
 };
 
-type TreeLeaf = {
+export type TreeLeaf = {
   type: 'leaf';
   id: string;
   name: string;
@@ -38,7 +38,7 @@ type TreeLeaf = {
 };
 
 
-async function getCurrentPrice(symbol: string): Promise<number> {
+export async function getCurrentPrice(symbol: string): Promise<number> {
   const response = await fetch(`https://api.polygon.io/v2/aggs/ticker/${symbol}/prev?adjusted=true&apiKey=${process.env.POLYGON_API_KEY}`);
   
   if (!response.ok) {
@@ -70,13 +70,13 @@ export const getHolding = async(id: string) => {
 
 }
 
-export const getHoldings = async() => {
+export async function getHoldings() {
   const supabase = await createClient();
   const { data: holdings, error } = await supabase
     .from('holdings')
     .select('id, symbol, purchase_price, shares_owned');
 
-  if (error || holdings == null) {
+  if (error || !holdings) {
     return null;
   }
 
@@ -93,14 +93,7 @@ export const getHoldings = async() => {
     };
   }));
 
-  const totalValue = children.reduce((sum, child) => sum + child.value, 0);
-
-  return {
-    type: 'node' as const,
-    name: "Portfolio",
-    value: totalValue,
-    children
-  };
+  return children;
 }
 
 export const getHoldingChart = async(id: string, timeframe: "day" | "week" | "month" | "year") => {

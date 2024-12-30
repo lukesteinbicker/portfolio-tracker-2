@@ -26,7 +26,6 @@ type TreemapProps = {
 
 export default function Treemap ({ data, className = "", onItemClick }: TreemapProps) {
   const hierarchy = d3.hierarchy(data).sum((d) => d.value);
-  const totalValue = hierarchy.value || 1; // Prevent division by zero
 
   const treeGenerator = d3.treemap<Tree>()
   .size([100, 100])
@@ -41,10 +40,6 @@ export default function Treemap ({ data, className = "", onItemClick }: TreemapP
     return 0;
   };
 
-  const getPercentOfPortfolio = (value: number) => {
-    return (value / totalValue) * 100;
-  };
-
   const colorScale = d3.scalePow<string>()
     .exponent(0.3)
     .domain([-25, 0, 25])
@@ -57,7 +52,6 @@ export default function Treemap ({ data, className = "", onItemClick }: TreemapP
     const height = leaf.y1 - leaf.y0;
     
     const fontSize = Math.min(width, height) * 0.25;
-    const percentShare = getPercentOfPortfolio(leafData.value);
 
     return (
       <g 
@@ -99,13 +93,6 @@ export default function Treemap ({ data, className = "", onItemClick }: TreemapP
     className="font-bold"
   >
     {leaf.data.name}
-  </tspan>
-  <tspan
-    fontSize={`${fontSize * 2.8}%`}
-    className="font-normal"
-    dx="0.3em"
-  >
-    {`${percentShare.toFixed(1)}%`}
   </tspan>
 </text>
       </g>
