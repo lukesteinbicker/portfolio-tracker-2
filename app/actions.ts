@@ -120,7 +120,7 @@ export const getHoldingChart = async(id: string, timeframe: "day" | "week" | "mo
     return data.results;
 }
 
-interface HoldingFormValues {
+export interface HoldingFormValues {
   symbol: string;
   date: Date;
   price: number;
@@ -163,4 +163,22 @@ export const deleteHolding = async(id: string) => {
   }
 
   return ["Success", "Holding deleted successfully"]
+}
+
+
+  
+export async function fetchPrice(ticker: string): Promise<any> {
+  const BASE_URL = "https://api.polygon.io/v1/open-close"
+  const date = dayjs().format('YYYY-MM-DD');
+  const url = `${BASE_URL}/${ticker}/${date}?adjusted=true&apiKey=${process.env.POLYGON_API_KEY}`;
+  const response = await fetch(url);
+  if (response.status === 200) {
+    const data = await response.json();
+    if (data.status === "OK") {
+      return data.open;
+    }
+    if (data.status === "NOT_FOUND") {
+      return ["Error", "Something went wrong"];
+    }
+  }
 }
