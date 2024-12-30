@@ -110,8 +110,8 @@ export const getHoldingChart = async(id: string, timeframe: "day" | "week" | "mo
     
     const start = timeframe == "day" ? dayjs().startOf("day").valueOf() : dayjs().subtract(1, timeframe).valueOf()
     const end = dayjs().valueOf()
-    const multiplier = timeframe == "day" ? 30 : timeframe == "week" ? 6 : timeframe == "month" ? 1 : 13
-    const division = timeframe == "day" ? "minute" : timeframe == "week" ? "hour" : "day"
+    const multiplier = timeframe == "day" ? 30 : timeframe == "week" ? 1 : timeframe == "month" ? 1 : 13
+    const division = timeframe == "day" ? "minute" : "day"
     const response = await fetch(`https://api.polygon.io/v2/aggs/ticker/${holding.symbol}/range/${multiplier}/${division}/${start}/${end}?adjusted=true&sort=asc&apiKey=${process.env.POLYGON_API_KEY}`)
     if (!response.ok) {
       return [];

@@ -75,7 +75,11 @@ if (results) {
                     <LineChart data={data}>
                         <XAxis dataKey="timestamp" />
                         <YAxis dataKey="value" domain={['auto', 'auto']} />
-                        <Tooltip />
+                        <Tooltip 
+    contentStyle={{ 
+        backgroundColor: 'var(--background)'
+    }}
+/>
                         <CartesianGrid strokeDasharray="3 3" />
                         <Line 
                             type="monotone" 
