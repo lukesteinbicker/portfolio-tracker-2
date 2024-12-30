@@ -70,6 +70,22 @@ export const getHolding = async(id: string) => {
 
 }
 
+export const getHoldingBySymbol = async(symbol: string) => {
+  const supabase = await createClient();
+  const { data: holding, error } = await supabase
+    .from('holdings')
+    .select('id, symbol, purchase_price, shares_owned')
+    .eq('symbol', symbol)
+    .single()
+
+  if (error || holding == null) {
+    return null;
+  }
+
+  return holding;
+}
+
+
 export async function getHoldings() {
   const supabase = await createClient();
   const { data: holdings, error } = await supabase
