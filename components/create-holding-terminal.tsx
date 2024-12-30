@@ -1,6 +1,7 @@
 import {
     Sheet,
     SheetContent,
+    SheetHeader,
     SheetTrigger,
 } from "@/components/ui/sheet"
 import { Button } from "./ui/button"
@@ -11,7 +12,9 @@ export default function CreateHoldingTerminal() {return (
 <Sheet>
   <SheetTrigger><Button variant="outline"><TerminalIcon/></Button></SheetTrigger>
   <SheetContent>
+    <SheetHeader>
     <Terminal />
+    </SheetHeader>
   </SheetContent>
 </Sheet>
 )
