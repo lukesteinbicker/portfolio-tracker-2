@@ -8,6 +8,7 @@ import { StockChart } from './stock-chart';
 import { EditHolding } from './edit-holding';
 import { getHoldings, TreeLeaf } from '@/app/actions';
 import { Skeleton } from './ui/skeleton';
+import { ProfileForm } from './terminal';
 
 type SelectedItem = {
   name: string;
@@ -69,6 +70,10 @@ export default function MainDashboard() {
           )}
         </CardContent>
       </Card>
+
+      <ProfileForm></ProfileForm>
+
+      
     </div>
   );
 }
