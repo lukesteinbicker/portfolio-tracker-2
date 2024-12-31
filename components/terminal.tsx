@@ -15,15 +15,19 @@ import {
   FormMessage,
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
-import { fetchPrice, addHolding, deleteHolding, HoldingFormValues, getHoldingBySymbol } from "@/app/actions"
+import { addHolding, HoldingFormValues, getHoldingBySymbol } from "@/app/actions"
 import { useToast } from "./hooks/use-toast"
+import amex from "./data/amex_tickers.json"
+import nasdaq from "./data/nasdaq_tickers.json"
+import nyse from "./data/nyse_tickers.json"
+import dayjs from "dayjs"
 
  
 const formSchema = z.object({
-  username: z.string()
+  command: z.string()
     .regex(
       /^(trade)\s+[a-zA-Z]+\s+[-]?\d+$/,
-      "Command must be in format: [trade] [ticker] [shares]"
+      "Command must be in format: trade [ticker] [shares]"
     )
     .refine((val) => {
       const parts = val.split(/\s+/);
@@ -40,44 +44,30 @@ export function Terminal() {
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
         defaultValues: {
-          username: "",
+          command: "",
         },
       })
       
       const { toast } = useToast();
       const onSubmit = async (values: z.infer<typeof formSchema>) => {
-        const [action, ticker, shares] = values.username.split(" ")
-        const price = await fetchPrice(ticker)
+        const [action, ticker, shares] = values.command.split(" ")
         const sharesNum = parseInt(shares)
         
+        if (!amex.includes(ticker.toUpperCase()) && !nasdaq.includes(ticker.toUpperCase()) && !nyse.includes(ticker.toUpperCase())) {
+          toast({
+            title: "Error",
+            description: "Symbol not listed on any exchange.",
+          })
+          return
+        }
 
-        const oldHolding = await getHoldingBySymbol(ticker)
-        if (oldHolding) {
-          // Failure message and end request if user attempts to execute illegal trade
-          if (oldHolding.shares_owned + sharesNum < 0) {
-            toast({
-              title: "Failed",
-              description: "Cannot sell more shares than the amount owned.",
-            })
-            return
-          }
-          const holdingData: HoldingFormValues = {
-            symbol: ticker,
-            date: new Date(),
-            shares: sharesNum + oldHolding.shares_owned,
-            price: price
-          };
-          addHolding(holdingData)
-        }
-        else {
-          const holdingData: HoldingFormValues = {
-            symbol: ticker,
-            date: new Date(),
+        const holdingData: HoldingFormValues = {
+            symbol: ticker.toUpperCase(),
+            date: dayjs().toDate(),
             shares: sharesNum,
-            price: price
+            price: null
           };
-          addHolding(holdingData)
-        }
+        addHolding(holdingData)
         
         toast({
           title: "Success",
@@ -88,10 +78,10 @@ export function Terminal() {
  
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
         <FormField
           control={form.control}
-          name="username"
+          name="command"
           render={({ field }) => (
             <FormItem>
               <FormLabel>Terminal</FormLabel>

@@ -11,9 +11,12 @@ type TreeLeaf = {
     type: 'leaf';
     id: string;
     name: string;
-    value: number;
     purchase_price: number;
+    price: number;
     shares_owned: number;
+    market_cap: string;
+    company_name: string;
+    description: string;
   };
 
 type Tree = TreeNode | TreeLeaf;
@@ -21,11 +24,11 @@ type Tree = TreeNode | TreeLeaf;
 type TreemapProps = {
   data: Tree;
   className?: string;
-  onItemClick: (item: { id: string; name: string; value: number; purchase_price: number; shares_owned: number }) => void;
+  onItemClick: (item: { id: string; name: string; purchase_price: number; price: number; shares_owned: number; market_cap: string; company_name: string; description: string }) => void;
 };
 
 export default function Treemap ({ data, className = "", onItemClick }: TreemapProps) {
-  const hierarchy = d3.hierarchy(data).sum((d) => d.value);
+  const hierarchy = d3.hierarchy(data).sum((d) => d.type === 'leaf' ? (d.price * d.shares_owned) : 0);
 
   const treeGenerator = d3.treemap<Tree>()
   .size([100, 100])
@@ -35,7 +38,7 @@ export default function Treemap ({ data, className = "", onItemClick }: TreemapP
 
   const getPercentChange = (leaf: d3.HierarchyRectangularNode<Tree>) => {
     if (leaf.data.type === 'leaf') {
-      return ((leaf.data.value - leaf.data.purchase_price) / leaf.data.purchase_price) * 100;
+      return ((leaf.data.price * leaf.data.shares_owned - leaf.data.purchase_price) / leaf.data.purchase_price) * 100;
     }
     return 0;
   };
@@ -59,9 +62,12 @@ export default function Treemap ({ data, className = "", onItemClick }: TreemapP
         onClick={() => onItemClick({
           id: leafData.id,
           name: leafData.name,
-          value: leafData.value,
           purchase_price: leafData.purchase_price,
-          shares_owned: leafData.shares_owned
+          price: leafData.price,
+          shares_owned: leafData.shares_owned,
+          company_name: leafData.company_name,
+          market_cap: leafData.market_cap,
+          description: leafData.description
         })}
         className="cursor-pointer"
       >

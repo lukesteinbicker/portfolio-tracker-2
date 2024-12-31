@@ -73,7 +73,7 @@ if (results) {
             <div className="w-full">
                 <ChartContainer config={chartConfig}>
                     <LineChart data={data}>
-                        <XAxis dataKey="timestamp" />
+                        <XAxis dataKey="timestamp" tick={false} />
                         <YAxis dataKey="value" domain={['auto', 'auto']} />
                         <Tooltip 
     contentStyle={{ 

@@ -220,7 +220,7 @@ export function HoldingForm({id} : {id: string | null}) {
                   name="price"
                   render={({ field }) => (
                     <FormItem className="flex-1">
-                      <FormLabel className="whitespace-nowrap overflow-hidden text-ellipsis">Total purchase price</FormLabel>
+                      <FormLabel className="whitespace-nowrap overflow-hidden text-ellipsis">Purchase price</FormLabel>
                       <FormControl>
                         <Input
                           type="number"
