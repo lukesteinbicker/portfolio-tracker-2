@@ -26,14 +26,14 @@ import dayjs from "dayjs"
 const formSchema = z.object({
   command: z.string()
     .regex(
-      /^(trade)\s+[a-zA-Z]+\s+[-]?\d+$/,
+      /^(trade)\s+[a-zA-Z]+\s+[-]?\d+(\.\d+)?$/,
       "Command must be in format: trade [ticker] [shares]"
     )
     .refine((val) => {
       const parts = val.split(/\s+/);
-      return parts.length === 3 && Number.isInteger(Number(parts[2]));
+      return parts.length === 3 && Number.isFinite(Number(parts[2]));
     }, {
-      message: "Must have exactly 3 parts and end with a valid integer"
+      message: "Must have exactly 3 parts and end with a valid number"
     })
 });
 
@@ -51,7 +51,7 @@ export function Terminal() {
       const { toast } = useToast();
       const onSubmit = async (values: z.infer<typeof formSchema>) => {
         const [action, ticker, shares] = values.command.split(" ")
-        const sharesNum = parseInt(shares)
+        const sharesNum = parseFloat(shares)
         
         if (!amex.includes(ticker.toUpperCase()) && !nasdaq.includes(ticker.toUpperCase()) && !nyse.includes(ticker.toUpperCase())) {
           toast({
