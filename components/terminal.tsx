@@ -67,11 +67,11 @@ export function Terminal() {
             shares: sharesNum,
             price: null
           };
-        addHolding(holdingData)
+      const response = await addHolding(holdingData)
         
         toast({
-          title: "Success",
-          description: "Executed trade. Refresh to update dashboard.",
+          title: response[0],
+          description: response[1],
         })
         
       }
