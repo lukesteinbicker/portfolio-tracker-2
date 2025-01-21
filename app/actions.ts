@@ -100,9 +100,16 @@ export async function getHoldings() {
     return null;
   }
   const children: TreeLeaf[] = await Promise.all(holdings.map(async (holding) => {
-    const currentPrice = await getCurrentPrice(holding.symbol);
+        // added examining short sells to get a proper response
+      let holdingSymbol = (String) (holding.symbol);
+      if (holdingSymbol.includes('-')) {
+        holdingSymbol = holdingSymbol.slice(0, -6);
+      }
+    const currentPrice = await getCurrentPrice(holdingSymbol);
     const currentValue = Math.round(currentPrice * holding.shares_owned);
-    const response = await fetch(`https://api.polygon.io/v3/reference/tickers/${holding.symbol}?apiKey=${process.env.POLYGON_API_KEY}`)
+
+
+    const response = await fetch(`https://api.polygon.io/v3/reference/tickers/${holdingSymbol}?apiKey=${process.env.POLYGON_API_KEY}`)
     const data = await response.json();
     const formatter = Intl.NumberFormat('en', {
       notation: 'compact',
@@ -113,6 +120,16 @@ export async function getHoldings() {
     const companyName = response.ok ? data.results.name : "Unknown";
     const marketCap = response.ok ? String(formatter.format(data.results.market_cap)) : "0";
     const description = response.ok ? data.results.description : "Unknown";
+
+    console.log(holding.id)
+    console.log(holding.symbol)
+    console.log(currentValue)// issue here
+    console.log(holding.purchase_price)
+    console.log(currentPrice)// issue here
+    console.log(holding.shares_owned)
+    console.log(marketCap)
+    console.log(companyName)
+    console.log(description)
     return {
       type: 'leaf' as const,
       id: holding.id,
@@ -236,7 +253,7 @@ export const addShortHolding = async(values: HoldingFormValues) => {
   if (values.price == null) {
     const { data, error } = await supabase
   .rpc('upsert_holdings', {
-    p_symbol: values.symbol + "(SHORT)",
+    p_symbol: values.symbol + "-SHORT",
     p_purchase_price: (await getCurrentPrice(values.symbol)) * values.shares,
     p_shares_to_add: values.shares,
     p_date: values.date
@@ -254,7 +271,7 @@ return ["Success", "Holding added successfully"]
   .from('holdings')
   .upsert(
     { 
-      symbol: values.symbol + "(SHORT)",
+      symbol: values.symbol + "-SHORT",
       purchase_price: values.price,
       shares_owned: values.shares,
       date: values.date
