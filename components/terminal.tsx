@@ -15,7 +15,7 @@ import {
   FormMessage,
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
-import { addHolding, HoldingFormValues, getHoldingBySymbol } from "@/app/actions"
+import { addHolding, HoldingFormValues, getHoldingBySymbol, addShortHolding } from "@/app/actions"
 import { useToast } from "./hooks/use-toast"
 import amex from "./data/amex_tickers.json"
 import nasdaq from "./data/nasdaq_tickers.json"
@@ -26,8 +26,8 @@ import dayjs from "dayjs"
 const formSchema = z.object({
   command: z.string()
     .regex(
-      /^(trade)\s+[a-zA-Z]+\s+[-]?\d+(\.\d+)?$/,
-      "Command must be in format: trade [ticker] [shares]"
+      /^(trade|short)\s+[a-zA-Z]+\s+[-]?\d+(\.\d+)?$/,
+      "Command must be in format: [trade/short] [ticker] [shares]"
     )
     .refine((val) => {
       const parts = val.split(/\s+/);
@@ -67,12 +67,28 @@ export function Terminal() {
             shares: sharesNum,
             price: null
           };
-      const response = await addHolding(holdingData)
+
+        let response;
+        if (action === "trade") {
+          response = await addHolding(holdingData)
+          toast({
+            title: response[0],
+            description: response[1],
+          })
+        } else if (action === "short") {
+          response = await addShortHolding(holdingData)
+          toast({
+            title: response[0],
+            description: response[1],
+          })
+        } else {
+          toast({
+            title: "Error",
+            description: "Invalid command: Make sure to enter only trade or short",
+          })
+        }
         
-        toast({
-          title: response[0],
-          description: response[1],
-        })
+        
         
       }
  
@@ -88,7 +104,7 @@ export function Terminal() {
               <FormDescription>
                 Enter commands in the format:
                 <br />
-              trade [ticker] [shares]
+              [trade/short] [ticker] [shares]
               </FormDescription>
               <FormControl>
                 <Input placeholder="Command" {...field} />

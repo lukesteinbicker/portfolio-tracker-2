@@ -231,6 +231,47 @@ return ["Success", "Holding added successfully"]
 }
 }
 
+export const addShortHolding = async(values: HoldingFormValues) => {
+  const supabase = await createClient();
+  if (values.price == null) {
+    const { data, error } = await supabase
+  .rpc('upsert_holdings', {
+    p_symbol: values.symbol + "(SHORT)",
+    p_purchase_price: (await getCurrentPrice(values.symbol)) * values.shares,
+    p_shares_to_add: values.shares,
+    p_date: values.date
+  })
+
+if (error) {
+  console.error(error)
+  return ["Error", "Something went wrong"];
+}
+
+return ["Success", "Holding added successfully"]
+  }
+  else {
+  const { data, error } = await supabase
+  .from('holdings')
+  .upsert(
+    { 
+      symbol: values.symbol + "(SHORT)",
+      purchase_price: values.price,
+      shares_owned: values.shares,
+      date: values.date
+    }, 
+    { onConflict: 'symbol' }
+  )
+  .select()
+
+  if (error) {
+    console.error(error)
+    return ["Error", "Something went wrong"];
+  }
+
+  return ["Success", "Holding added successfully"]
+}
+}
+
 export const deleteHolding = async(id: string) => {
   const supabase = await createClient();
   const { data, error } = await supabase
