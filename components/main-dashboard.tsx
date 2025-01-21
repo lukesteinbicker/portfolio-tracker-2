@@ -83,15 +83,26 @@ export default function MainDashboard() {
     <div className="w-full space-y-4">
       <div className="grid grid-cols-2 gap-4">
         
-        <div className="space-y-2">
-          <Label>Percent Change</Label>
-          <p className="text-muted-foreground">{selectedItem.price - (selectedItem.purchase_price / selectedItem.shares_owned) < 0 ? "-" : "+"}{Math.abs((((selectedItem.price * selectedItem.shares_owned) - selectedItem.purchase_price)/selectedItem.purchase_price) * 100).toFixed(2)}%</p>
-        </div>
+      <div className="space-y-2">
+  <Label>Percent Change</Label>
+  <p className="text-muted-foreground">
+    {selectedItem.name.includes('-') 
+      ? (selectedItem.price - (selectedItem.purchase_price / selectedItem.shares_owned) < 0 ? "+" : "-")
+      : (selectedItem.price - (selectedItem.purchase_price / selectedItem.shares_owned) < 0 ? "-" : "+")}
+    {Math.abs((((selectedItem.price * selectedItem.shares_owned) - selectedItem.purchase_price)/selectedItem.purchase_price) * 100).toFixed(2)}%
+  </p>
+</div>
 
-        <div className="space-y-2">
-          <Label>Dollar Change</Label>
-          <p className="text-muted-foreground">{selectedItem.price - (selectedItem.purchase_price / selectedItem.shares_owned) < 0 ? "-" : "+"}${Math.abs(selectedItem.price - (selectedItem.purchase_price / selectedItem.shares_owned)).toFixed(2)}</p>
-        </div>
+<div className="space-y-2">
+  <Label>Dollar Change</Label>
+  <p className="text-muted-foreground">
+    {selectedItem.name.includes('-')
+      ? (selectedItem.price - (selectedItem.purchase_price / selectedItem.shares_owned) < 0 ? "+" : "-")
+      : (selectedItem.price - (selectedItem.purchase_price / selectedItem.shares_owned) < 0 ? "-" : "+")}
+    ${Math.abs(selectedItem.price - (selectedItem.purchase_price / selectedItem.shares_owned)).toFixed(2)}
+  </p>
+</div>
+
         
         <Separator className="col-span-2" />
 

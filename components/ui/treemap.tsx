@@ -38,7 +38,7 @@ export default function Treemap ({ data, className = "", onItemClick }: TreemapP
 
   const getPercentChange = (leaf: d3.HierarchyRectangularNode<Tree>) => {
     if (leaf.data.type === 'leaf') {
-      return ((leaf.data.price * leaf.data.shares_owned - leaf.data.purchase_price) / leaf.data.purchase_price) * 100;
+      return leaf.data.name.includes('-') ? -(((leaf.data.price * leaf.data.shares_owned - leaf.data.purchase_price) / leaf.data.purchase_price) * 100) : ((leaf.data.price * leaf.data.shares_owned - leaf.data.purchase_price) / leaf.data.purchase_price) * 100;
     }
     return 0;
   };
