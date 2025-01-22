@@ -20,6 +20,7 @@ type SelectedItem = {
   company_name: string;
   shares_owned: number;
   description: string;
+  short: boolean;
 } | null;
 
 export default function MainDashboard() {
@@ -86,8 +87,8 @@ export default function MainDashboard() {
       <div className="space-y-2">
   <Label>Percent Change</Label>
   <p className="text-muted-foreground">
-    {selectedItem.name.includes('-') 
-      ? (selectedItem.price - (selectedItem.purchase_price / selectedItem.shares_owned) < 0 ? "+" : "-")
+    {selectedItem.short == true
+      ? (selectedItem.price - (selectedItem.purchase_price / selectedItem.shares_owned) > 0 ? "-" : "+")
       : (selectedItem.price - (selectedItem.purchase_price / selectedItem.shares_owned) < 0 ? "-" : "+")}
     {Math.abs((((selectedItem.price * selectedItem.shares_owned) - selectedItem.purchase_price)/selectedItem.purchase_price) * 100).toFixed(2)}%
   </p>
@@ -96,8 +97,8 @@ export default function MainDashboard() {
 <div className="space-y-2">
   <Label>Dollar Change</Label>
   <p className="text-muted-foreground">
-    {selectedItem.name.includes('-')
-      ? (selectedItem.price - (selectedItem.purchase_price / selectedItem.shares_owned) < 0 ? "+" : "-")
+    {selectedItem.short == true
+      ? (selectedItem.price - (selectedItem.purchase_price / selectedItem.shares_owned) > 0 ? "-" : "+")
       : (selectedItem.price - (selectedItem.purchase_price / selectedItem.shares_owned) < 0 ? "-" : "+")}
     ${Math.abs(selectedItem.price - (selectedItem.purchase_price / selectedItem.shares_owned)).toFixed(2)}
   </p>

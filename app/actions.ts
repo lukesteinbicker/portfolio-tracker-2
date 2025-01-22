@@ -39,6 +39,7 @@ export type TreeLeaf = {
   market_cap: string;
   company_name: string;
   description: string;
+  short: boolean;
 };
 
 
@@ -94,17 +95,13 @@ export async function getHoldings() {
   const supabase = await createClient();
   const { data: holdings, error } = await supabase
     .from('holdings')
-    .select('id, symbol, purchase_price, shares_owned');
+    .select('id, symbol, purchase_price, shares_owned, short');
 
   if (error || !holdings) {
     return null;
   }
   const children: TreeLeaf[] = await Promise.all(holdings.map(async (holding) => {
-        // added examining short sells to get a proper response
-      let holdingSymbol = (String) (holding.symbol);
-      if (holdingSymbol.includes('-')) {
-        holdingSymbol = holdingSymbol.slice(0, -6);
-      }
+    const holdingSymbol = holding.symbol
     const currentPrice = await getCurrentPrice(holdingSymbol);
     const currentValue = Math.round(currentPrice * holding.shares_owned);
 
@@ -116,20 +113,9 @@ export async function getHoldings() {
       maximumFractionDigits: 2,
       compactDisplay: 'short'
     });
-    
     const companyName = response.ok ? data.results.name : "Unknown";
     const marketCap = response.ok ? String(formatter.format(data.results.market_cap)) : "0";
     const description = response.ok ? data.results.description : "Unknown";
-
-    console.log(holding.id)
-    console.log(holding.symbol)
-    console.log(currentValue)// issue here
-    console.log(holding.purchase_price)
-    console.log(currentPrice)// issue here
-    console.log(holding.shares_owned)
-    console.log(marketCap)
-    console.log(companyName)
-    console.log(description)
     return {
       type: 'leaf' as const,
       id: holding.id,
@@ -140,7 +126,8 @@ export async function getHoldings() {
       shares_owned: holding.shares_owned,
       market_cap: marketCap,
       company_name: companyName,
-      description: description
+      description: description,
+      short: holding.short
     };
   }));
 
@@ -209,35 +196,16 @@ export interface HoldingFormValues {
 
 export const addHolding = async(values: HoldingFormValues) => {
   const supabase = await createClient();
-  if (values.price == null) {
-    const { data, error } = await supabase
-  .rpc('upsert_holdings', {
-    p_symbol: values.symbol,
-    p_purchase_price: (await getCurrentPrice(values.symbol)) * values.shares,
-    p_shares_to_add: values.shares,
-    p_date: values.date
-  })
-
-if (error) {
-  console.error(error)
-  return ["Error", "Something went wrong"];
-}
-
-return ["Success", "Holding added successfully"]
-  }
-  else {
+  const purchasePrice = values.price ?? (await getCurrentPrice(values.symbol)) * values.shares;
+  
   const { data, error } = await supabase
-  .from('holdings')
-  .upsert(
-    { 
-      symbol: values.symbol,
-      purchase_price: values.price,
-      shares_owned: values.shares,
-      date: values.date
-    }, 
-    { onConflict: 'symbol' }
-  )
-  .select()
+    .rpc('upsert_holdings', {
+      p_symbol: values.symbol,
+      p_purchase_price: purchasePrice,
+      p_shares_to_add: values.shares,
+      p_date: values.date,
+      p_short: false
+    });
 
   if (error) {
     console.error(error)
@@ -245,40 +213,20 @@ return ["Success", "Holding added successfully"]
   }
 
   return ["Success", "Holding added successfully"]
-}
 }
 
 export const addShortHolding = async(values: HoldingFormValues) => {
   const supabase = await createClient();
-  if (values.price == null) {
-    const { data, error } = await supabase
-  .rpc('upsert_holdings', {
-    p_symbol: values.symbol + "-SHORT",
-    p_purchase_price: (await getCurrentPrice(values.symbol)) * values.shares,
-    p_shares_to_add: values.shares,
-    p_date: values.date
-  })
+  const purchasePrice = values.price ?? (await getCurrentPrice(values.symbol)) * values.shares;
 
-if (error) {
-  console.error(error)
-  return ["Error", "Something went wrong"];
-}
-
-return ["Success", "Holding added successfully"]
-  }
-  else {
   const { data, error } = await supabase
-  .from('holdings')
-  .upsert(
-    { 
-      symbol: values.symbol + "-SHORT",
-      purchase_price: values.price,
-      shares_owned: values.shares,
-      date: values.date
-    }, 
-    { onConflict: 'symbol' }
-  )
-  .select()
+    .rpc('upsert_holdings', {
+      p_symbol: values.symbol,
+      p_purchase_price: purchasePrice,
+      p_shares_to_add: values.shares,
+      p_date: values.date,
+      p_short: true
+    });
 
   if (error) {
     console.error(error)
@@ -286,7 +234,6 @@ return ["Success", "Holding added successfully"]
   }
 
   return ["Success", "Holding added successfully"]
-}
 }
 
 export const deleteHolding = async(id: string) => {

@@ -17,6 +17,7 @@ type TreeLeaf = {
     market_cap: string;
     company_name: string;
     description: string;
+    short: boolean
   };
 
 type Tree = TreeNode | TreeLeaf;
@@ -24,7 +25,7 @@ type Tree = TreeNode | TreeLeaf;
 type TreemapProps = {
   data: Tree;
   className?: string;
-  onItemClick: (item: { id: string; name: string; purchase_price: number; price: number; shares_owned: number; market_cap: string; company_name: string; description: string }) => void;
+  onItemClick: (item: { id: string; name: string; purchase_price: number; price: number; shares_owned: number; market_cap: string; company_name: string; description: string; short: boolean }) => void;
 };
 
 export default function Treemap ({ data, className = "", onItemClick }: TreemapProps) {
@@ -38,7 +39,7 @@ export default function Treemap ({ data, className = "", onItemClick }: TreemapP
 
   const getPercentChange = (leaf: d3.HierarchyRectangularNode<Tree>) => {
     if (leaf.data.type === 'leaf') {
-      return leaf.data.name.includes('-') ? -(((leaf.data.price * leaf.data.shares_owned - leaf.data.purchase_price) / leaf.data.purchase_price) * 100) : ((leaf.data.price * leaf.data.shares_owned - leaf.data.purchase_price) / leaf.data.purchase_price) * 100;
+      return leaf.data.short ? -(((leaf.data.price * leaf.data.shares_owned - leaf.data.purchase_price) / leaf.data.purchase_price) * 100) : ((leaf.data.price * leaf.data.shares_owned - leaf.data.purchase_price) / leaf.data.purchase_price) * 100;
     }
     return 0;
   };
@@ -67,7 +68,8 @@ export default function Treemap ({ data, className = "", onItemClick }: TreemapP
           shares_owned: leafData.shares_owned,
           company_name: leafData.company_name,
           market_cap: leafData.market_cap,
-          description: leafData.description
+          description: leafData.description,
+          short: leafData.short
         })}
         className="cursor-pointer"
       >

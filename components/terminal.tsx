@@ -26,8 +26,8 @@ import dayjs from "dayjs"
 const formSchema = z.object({
   command: z.string()
     .regex(
-      /^(trade|short)\s+[a-zA-Z]+\s+[-]?\d+(\.\d+)?$/,
-      "Command must be in format: [trade/short] [ticker] [shares]"
+      /^(buy|short)\s+[a-zA-Z]+\s+[-]?\d+(\.\d+)?$/,
+      "Command must be in format: [buy/short] [ticker] [shares]"
     )
     .refine((val) => {
       const parts = val.split(/\s+/);
@@ -69,7 +69,7 @@ export function Terminal() {
           };
 
         let response;
-        if (action === "trade") {
+        if (action === "buy") {
           response = await addHolding(holdingData)
           toast({
             title: response[0],
@@ -84,7 +84,7 @@ export function Terminal() {
         } else {
           toast({
             title: "Error",
-            description: "Invalid command: Make sure to enter only trade or short",
+            description: "Invalid command: Make sure to enter only buy or short",
           })
         }
         
@@ -104,7 +104,7 @@ export function Terminal() {
               <FormDescription>
                 Enter commands in the format:
                 <br />
-              [trade/short] [ticker] [shares]
+              [buy/short] [ticker] [shares]
               </FormDescription>
               <FormControl>
                 <Input placeholder="Command" {...field} />
