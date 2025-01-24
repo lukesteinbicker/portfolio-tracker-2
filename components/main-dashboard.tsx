@@ -120,7 +120,7 @@ export default function MainDashboard() {
         <Separator className="col-span-2" />
         
         <div className="space-y-2">
-          <Label>Shares Owned</Label>
+          <Label>{selectedItem.short == true ? "Shares Borrowed" : "Shares Owned"}</Label>
           <p className="text-muted-foreground">{selectedItem.shares_owned}</p>
         </div>
 

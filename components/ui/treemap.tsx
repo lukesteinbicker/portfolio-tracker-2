@@ -59,51 +59,52 @@ export default function Treemap ({ data, className = "", onItemClick }: TreemapP
 
     return (
       <g 
-        key={leafData.id}
-        onClick={() => onItemClick({
-          id: leafData.id,
-          name: leafData.name,
-          purchase_price: leafData.purchase_price,
-          price: leafData.price,
-          shares_owned: leafData.shares_owned,
-          company_name: leafData.company_name,
-          market_cap: leafData.market_cap,
-          description: leafData.description,
-          short: leafData.short
-        })}
-        className="cursor-pointer"
-      >
-        <defs>
-          <linearGradient id={`gradient-${leafData.id}`} x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor={colorScale(getPercentChange(leaf))} stopOpacity="1"/>
-            <stop offset="100%" stopColor={colorScale(getPercentChange(leaf))} stopOpacity="0.8"/>
-          </linearGradient>
-        </defs>
-        <rect
-          x={`${leaf.x0}%`}
-          y={`${leaf.y0}%`}
-          width={`${width}%`}
-          height={`${height}%`}
-          stroke="currentColor"
-          strokeWidth="0.2"
-          fill={`url(#gradient-${leafData.id})`}
-          className="opacity-90 hover:opacity-100 transition-opacity duration-200"
-        />
-        <text
-  x={`${leaf.x0 + width/2}%`}
-  y={`${leaf.y0 + height/2}%`}
-  textAnchor="middle"
-  fill="currentColor"
-  className="pointer-events-none"
+  key={leafData.id}
+  onClick={() => onItemClick({...leafData})}
+  className="cursor-pointer"
 >
-  <tspan
-    fontSize={`${fontSize * 3.5}%`}
-    className="font-bold"
+  <defs>
+    <linearGradient id={`gradient-${leafData.id}`} x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stopColor={colorScale(getPercentChange(leaf))} stopOpacity="1"/>
+      <stop offset="100%" stopColor={colorScale(getPercentChange(leaf))} stopOpacity="0.8"/>
+    </linearGradient>
+    
+    <pattern 
+      id={`stripe-${leafData.id}`} 
+      patternUnits="userSpaceOnUse" 
+      width="2" 
+      height="2" 
+      patternTransform="rotate(45)"
+    >
+      <rect width="0.5" height="2" fill={colorScale(getPercentChange(leaf))} />
+    </pattern>
+  </defs>
+  
+  <rect
+    x={`${leaf.x0}%`}
+    y={`${leaf.y0}%`}
+    width={`${width}%`}
+    height={`${height}%`}
+    stroke="currentColor"
+    strokeWidth="0.2"
+    fill={leafData.short ? `url(#stripe-${leafData.id})` : `url(#gradient-${leafData.id})`}
+    className="opacity-90 hover:opacity-100 transition-opacity duration-200"
+  />
+  <text
+    x={`${leaf.x0 + width/2}%`}
+    y={`${leaf.y0 + height/2}%`}
+    textAnchor="middle"
+    fill="currentColor"
+    className="pointer-events-none"
   >
-    {leaf.data.name}
-  </tspan>
-</text>
-      </g>
+    <tspan
+      fontSize={`${fontSize * 3.5}%`}
+      className="font-bold"
+    >
+      {leaf.data.name}
+    </tspan>
+  </text>
+</g>
     );
   });
 
