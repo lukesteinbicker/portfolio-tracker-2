@@ -21,7 +21,7 @@ import {
   FormMessage,
 } from "@/components/ui/form"
 import { SubmitButton } from "./submit-button"
-import { addPortfolio, getPortfolio } from "@/app/actions"
+import { editPortfolio, getPortfolio } from "@/app/actions"
 import { toast } from "./hooks/use-toast"
 import { Input } from "./ui/input"
 import { Textarea } from "./ui/text-area"
@@ -34,7 +34,7 @@ export interface PortfolioFormValues {
   const formSchema = z.object({
     name: z.string()
       .min(1, { message: "Field empty" })
-      .max(12, { message: "Maximum of 12 characters allowed" }),
+      .max(20, { message: "Maximum of 20 characters allowed" }),
     description: z.string()
       .min(1, { message: "Field empty" })
       .max(100, { message: "Maximum of 100 characters allowed" })
@@ -65,7 +65,7 @@ export function PortfolioForm({id} : {id: string | null}) {
   
   async function onSubmit(values: PortfolioFormValues) {
     try {
-      const response = await addPortfolio(values)
+      const response = await editPortfolio(values, id)
       toast({
         title: response[0],
         description: response[1]

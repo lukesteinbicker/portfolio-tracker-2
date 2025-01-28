@@ -114,7 +114,7 @@ useEffect(() => {
 
         <div className="space-y-2">
           <Label>Purchase Price</Label>
-          <p className="text-muted-foreground">${selectedItem.purchase_price / selectedItem.shares_owned}</p>
+          <p className="text-muted-foreground">${(selectedItem.purchase_price / selectedItem.shares_owned).toFixed(2)}</p>
         </div>
         
         <div className="space-y-2">

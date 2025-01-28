@@ -307,3 +307,22 @@ export const getPortfolio = async(id: string) => {
   return portfolio;
 
 }
+
+export const editPortfolio = async(values: PortfolioFormValues, id: string | null) => {
+  if (id == null) {
+    return ["Error", "Something went wrong"];
+  }
+  const supabase = await createClient();
+  const { data, error } = await supabase
+  .from('portfolio')
+  .update({ name: values.name, description: values.description })
+  .eq('id', id)
+  .select()
+
+  if (error) {
+    console.error(error)
+    return ["Error", "Something went wrong"];
+  }
+
+  return ["Success", "Portfolio edited successfully"]
+}
