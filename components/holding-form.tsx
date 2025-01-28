@@ -2,9 +2,6 @@
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
-import amextickers from './data/amex_tickers.json'
-import nysetickers from './data/nyse_tickers.json'
-import nasdaqtickers from './data/nasdaq_tickers.json'
 import {
   Select,
   SelectContent,
@@ -32,6 +29,7 @@ import { Input } from "./ui/input"
 import amex from "./data/amex_tickers.json"
 import nasdaq from "./data/nasdaq_tickers.json"
 import nyse from "./data/nyse_tickers.json"
+import { usePathname } from "next/navigation"
 
 const formSchema = z.object({
   exchange: z.enum(["nyse", "nasdaq", "amex"], {
@@ -63,11 +61,12 @@ interface HoldingFormValues {
   date: Date;
   price: number;
   shares: number;
+  portfolio_id: string;
 }
 
 export function HoldingForm({id} : {id: string | null}) {
   const [symbol, setSymbol] = useState("")
-  const [tickers, setTickers] = useState(nysetickers)
+  const [tickers, setTickers] = useState(nyse)
   const [value, setValue] = useState<{
     startDate: Date | null;
     endDate: Date | null;
@@ -97,6 +96,7 @@ export function HoldingForm({id} : {id: string | null}) {
             date: new Date(),
             price: holding.purchase_price,
             shares: holding.shares_owned,
+            portfolio_id: holding.portfolio_id
           }
         }
       }
@@ -106,6 +106,7 @@ export function HoldingForm({id} : {id: string | null}) {
         date: new Date(),
         price: 0,
         shares: 0,
+        portfolio_id: ""
       }
     }
   })
@@ -139,6 +140,9 @@ export function HoldingForm({id} : {id: string | null}) {
       }
     }
     try {
+      const pathname = usePathname();
+      const portfolioid = pathname.substring(pathname.lastIndexOf('/') + 1);
+      values.portfolio_id = portfolioid
       const response = await addHolding(values)
       toast({
         title: response[0],
@@ -167,10 +171,10 @@ export function HoldingForm({id} : {id: string | null}) {
     field.onChange(value);
     setTickers(
       value === "nyse" 
-        ? nysetickers 
+        ? nyse
         : value === "nasdaq" 
-          ? nasdaqtickers 
-          : amextickers
+          ? nasdaq
+          : amex
     );
   }}
   value={field.value}

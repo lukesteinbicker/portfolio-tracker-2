@@ -10,6 +10,7 @@ import { getHoldings, TreeLeaf } from '@/app/actions';
 import { Skeleton } from './ui/skeleton';
 import { Label } from './ui/label';
 import { Separator } from './ui/separator';
+import { usePathname } from 'next/navigation';
 
 type SelectedItem = {
   name: string;
@@ -27,13 +28,17 @@ export default function MainDashboard() {
   const [holdingsData, setHoldingsData] = useState<TreeLeaf[] | null>(null);
   const [selectedItem, setSelectedItem] = useState<SelectedItem>(null);
 
-  useEffect(() => {
-    const fetchHoldings = async () => {
-      const data = await getHoldings();
-      setHoldingsData(data);
-    };
-    fetchHoldings();
-  }, []);
+  const pathname = usePathname();
+  const portfolioid = pathname.substring(pathname.lastIndexOf('/') + 1);
+  console.log(portfolioid)
+
+useEffect(() => {
+  const fetchHoldings = async () => {
+    const data = await getHoldings(portfolioid);
+    setHoldingsData(data);
+  };
+  fetchHoldings();
+}, [portfolioid]);
 
   const handleItemClick = (item: SelectedItem) => {
     setSelectedItem(item);

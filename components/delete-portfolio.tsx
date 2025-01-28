@@ -1,4 +1,4 @@
-import { deleteHolding } from "@/app/actions"
+import { deleteHolding, deletePortfolio } from "@/app/actions"
 import { Button } from "@/components/ui/button"
 import {
   Dialog,
@@ -11,10 +11,10 @@ import {
 import { Trash } from "lucide-react"
 import { toast } from "./hooks/use-toast"
 
-export function DeleteHolding({id} : {id: string}) {
+export function DeletePortfolio({id} : {id: string}) {
 
   async function submitDeletion() {
-    const response = await deleteHolding(id)
+    const response = await deletePortfolio(id)
     toast({
       title: response[0],
       description: response[1]})
@@ -27,9 +27,9 @@ export function DeleteHolding({id} : {id: string}) {
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>Delete holding</DialogTitle>
+          <DialogTitle>Delete portfolio</DialogTitle>
           <DialogDescription>
-            Are you sure you want to delete this holding permanently?
+            Are you sure you want to delete this portfolio permanently?
           </DialogDescription>
         </DialogHeader>
         <Button variant="destructive" type="submit" onClick={submitDeletion}>Delete</Button>

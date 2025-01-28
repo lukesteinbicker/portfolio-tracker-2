@@ -15,12 +15,13 @@ import {
   FormMessage,
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
-import { addHolding, HoldingFormValues, getHoldingBySymbol, addShortHolding } from "@/app/actions"
+import { addHolding, HoldingFormValues, addShortHolding } from "@/app/actions"
 import { useToast } from "./hooks/use-toast"
 import amex from "./data/amex_tickers.json"
 import nasdaq from "./data/nasdaq_tickers.json"
 import nyse from "./data/nyse_tickers.json"
 import dayjs from "dayjs"
+import { usePathname } from "next/navigation"
 
  
 const formSchema = z.object({
@@ -48,6 +49,7 @@ export function Terminal() {
         },
       })
       
+      const pathname = usePathname()
       const { toast } = useToast();
       const onSubmit = async (values: z.infer<typeof formSchema>) => {
         const [action, ticker, shares] = values.command.split(" ")
@@ -60,8 +62,10 @@ export function Terminal() {
           })
           return
         }
+        const portfolioid = pathname.substring(pathname.lastIndexOf('/') + 1);
 
         const holdingData: HoldingFormValues = {
+            portfolio_id: portfolioid,
             symbol: ticker.toUpperCase(),
             date: dayjs().toDate(),
             shares: sharesNum,

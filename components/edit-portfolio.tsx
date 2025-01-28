@@ -9,9 +9,9 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog"
 import { Pen } from "lucide-react"
-import { HoldingForm } from "./holding-form"
+import { PortfolioForm } from "./portfolio-form"
 
-export function EditHolding({id} : {id: string}) {
+export function EditPortfolio({id} : {id: string}) {
   return (
     <Dialog>
       <DialogTrigger asChild>
@@ -19,12 +19,12 @@ export function EditHolding({id} : {id: string}) {
       </DialogTrigger>
       <DialogContent className="sm:max-w-[600px]">
         <DialogHeader>
-          <DialogTitle>Edit holding</DialogTitle>
+          <DialogTitle>Edit portfolio</DialogTitle>
           <DialogDescription>
             Enter relevant information below
           </DialogDescription>
         </DialogHeader>
-        <HoldingForm id={id} />
+        <PortfolioForm id={id} />
       </DialogContent>
     </Dialog>
   )

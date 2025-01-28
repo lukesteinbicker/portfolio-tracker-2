@@ -8,23 +8,23 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog"
-import { Pen } from "lucide-react"
-import { HoldingForm } from "./holding-form"
+import { ListPlus } from "lucide-react"
+import { PortfolioForm } from "./portfolio-form"
 
-export function EditHolding({id} : {id: string}) {
+export function CreatePortfolio() {
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button variant="outline" size="sm"><Pen/></Button>
+        <Button variant="outline"><ListPlus/></Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[600px]">
         <DialogHeader>
-          <DialogTitle>Edit holding</DialogTitle>
+          <DialogTitle>Create portfolio</DialogTitle>
           <DialogDescription>
             Enter relevant information below
           </DialogDescription>
         </DialogHeader>
-        <HoldingForm id={id} />
+        <PortfolioForm id={null}/>
       </DialogContent>
     </Dialog>
   )

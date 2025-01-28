@@ -1,32 +1,26 @@
-import { createClient } from "@/utils/supabase/server";
-import { redirect } from "next/navigation";
-import { CreateHolding } from "@/components/create-holding";
-import MainDashboard from "@/components/main-dashboard";
-import CreateHoldingTerminal from "@/components/create-holding-terminal";
+import { getPortfolios } from "@/app/actions";
+import { Card, CardContent, CardTitle } from "@/components/ui/card";
+import Link from "next/link";
 
-export default async function ProtectedPage() {
-  const supabase = await createClient();
+export default async function Page() {
+    const portfoliosData = await getPortfolios();
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (!user) {
-    return redirect("/sign-in");
-  }
-
-  return (
-    <div className="flex-1 w-full flex flex-col gap-6 my-10 px-4">
-      <div className="flex items-center justify-between mx-auto w-full">
-        <h1 className="text-4xl">Portfolio</h1>
-        <div className="flex items-center gap-4">
-        <CreateHoldingTerminal />
-        <CreateHolding />
+    return (
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+            {portfoliosData?.map((portfolio) => (
+                <Link href={`/dashboard/${portfolio.id}`}>
+                <Card key={portfolio.id}>
+                    <CardTitle className="p-6">
+                        
+                            {portfolio.name}
+                        
+                    </CardTitle>
+                    <CardContent className="text-muted-foreground">
+                        {portfolio.description}
+                    </CardContent>
+                </Card>
+                </Link>
+            ))}
         </div>
-      </div>
-      <div className="mx-auto w-full">
-        <MainDashboard />
-      </div>
-    </div>
-  );
+    );
 }

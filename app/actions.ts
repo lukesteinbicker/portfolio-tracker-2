@@ -63,7 +63,7 @@ export const getHolding = async(id: string) => {
   const supabase = await createClient();
   const { data: holding, error } = await supabase
     .from('holdings')
-    .select('id, symbol, purchase_price, shares_owned')
+    .select('id, symbol, purchase_price, shares_owned, portfolio_id')
     .eq('id', id)
     .single()
 
@@ -75,27 +75,14 @@ export const getHolding = async(id: string) => {
 
 }
 
-export const getHoldingBySymbol = async(symbol: string) => {
-  const supabase = await createClient();
-  const { data: holding, error } = await supabase
-    .from('holdings')
-    .select('id, symbol, purchase_price, shares_owned')
-    .eq('symbol', symbol)
-    .single()
 
-  if (error || holding == null) {
-    return null;
-  }
-
-  return holding;
-}
-
-
-export async function getHoldings() {
+export async function getHoldings(portfolioid: string) {
   const supabase = await createClient();
   const { data: holdings, error } = await supabase
     .from('holdings')
-    .select('id, symbol, purchase_price, shares_owned, short');
+    .select('id, symbol, purchase_price, shares_owned, short')
+    .eq('portfolio_id', portfolioid);
+
 
   if (error || !holdings) {
     return null;
@@ -188,10 +175,16 @@ export const getHoldingChart = async(id: string, timeframe: "day" | "week" | "mo
 }
 
 export interface HoldingFormValues {
+  portfolio_id: string;
   symbol: string;
   date: Date;
   price: number | null;
   shares: number;
+}
+
+export interface PortfolioFormValues {
+  name: string;
+  description: string;
 }
 
 export const addHolding = async(values: HoldingFormValues) => {
@@ -204,6 +197,7 @@ export const addHolding = async(values: HoldingFormValues) => {
       p_purchase_price: purchasePrice,
       p_shares_to_add: values.shares,
       p_date: values.date,
+      p_portfolio_id: values.portfolio_id,
       p_short: false
     });
 
@@ -225,6 +219,7 @@ export const addShortHolding = async(values: HoldingFormValues) => {
       p_purchase_price: purchasePrice,
       p_shares_to_add: values.shares,
       p_date: values.date,
+      p_portfolio_id: values.portfolio_id,
       p_short: true
     });
 
@@ -249,4 +244,66 @@ export const deleteHolding = async(id: string) => {
   }
 
   return ["Success", "Holding deleted successfully"]
+}
+
+export const addPortfolio = async(values: PortfolioFormValues) => {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+  .from('portfolio')
+  .insert({
+    name: values.name,
+    description: values.description
+  })
+  .select()
+
+  if (error) {
+    console.error(error)
+    return ["Error", "Something went wrong"];
+  }
+
+  return ["Success", "Portfolio added successfully"]
+}
+
+export const deletePortfolio = async(id: string) => {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+  .from('portfolio')
+  .delete()
+  .eq('id', id)
+
+  if (error) {
+    console.error(error)
+    return ["Error", "Something went wrong"];
+  }
+
+  return ["Success", "Portfolio deleted successfully"]
+}
+
+export async function getPortfolios() {
+  const supabase = await createClient();
+  const { data: portfolio, error } = await supabase
+    .from('portfolio')
+    .select('id, name, description');
+
+  if (error || !portfolio) {
+    return null;
+  }
+  
+  return (portfolio);
+}
+
+export const getPortfolio = async(id: string) => {
+  const supabase = await createClient();
+  const { data: portfolio, error } = await supabase
+    .from('portfolio')
+    .select('id, name, description')
+    .eq('id', id)
+    .single()
+
+  if (error || portfolio == null) {
+    return null;
+  }
+
+  return portfolio;
+
 }
