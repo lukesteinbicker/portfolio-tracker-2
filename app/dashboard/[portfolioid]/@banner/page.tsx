@@ -4,7 +4,6 @@ import { CreateHolding } from "@/components/create-holding";
 import CreateHoldingTerminal from "@/components/create-holding-terminal";
 import { Button } from "@/components/ui/button";
 import { Check, ChevronsUpDown } from "lucide-react"
-import { cn } from "@/lib/utils"
 import {
     Command,
     CommandEmpty,
@@ -72,6 +71,7 @@ export default function Page () {
             <ScrollArea>
               {portfoliosData?.map((portfolio) => (
                 <span className="flex items-center">
+                <Link className="w-full mr-2" href={`/dashboard/${portfolio.id}`}>
                 <CommandItem
                   key={portfolio.id}
                   value={portfolio.name}
@@ -79,18 +79,10 @@ export default function Page () {
                     setValue(currentValue === value ? "" : currentValue)
                     setOpen(false)
                   }}
-                  className="w-full mr-2"
                 >
-                    <Link href={`/dashboard/${portfolio.id}`}>
-                  <Check
-                    className={cn(
-                      "mr-2 h-4 w-4",
-                      value === portfolio.name ? "opacity-100" : "opacity-0"
-                    )}
-                  />
                   {portfolio.name}
-                  </Link>
                 </CommandItem>
+                </Link>
                 <div className="flex items-center gap-2">
                 <EditPortfolio id={portfolio.id} />
                 <DeletePortfolio id={portfolio.id} />
