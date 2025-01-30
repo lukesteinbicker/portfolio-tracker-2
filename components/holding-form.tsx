@@ -21,7 +21,7 @@ import {
   FormMessage,
 } from "@/components/ui/form"
 import { SubmitButton } from "./submit-button"
-import { addHolding, getHolding } from "@/app/actions"
+import { addExistingHolding, getHolding } from "@/app/actions"
 import { toast } from "./hooks/use-toast"
 import { useState } from "react"; 
 import Datepicker from "react-tailwindcss-datepicker"; 
@@ -65,6 +65,7 @@ interface HoldingFormValues {
 }
 
 export function HoldingForm({id} : {id: string | null}) {
+  const pathname = usePathname();
   const [symbol, setSymbol] = useState("")
   const [tickers, setTickers] = useState(nyse)
   const [value, setValue] = useState<{
@@ -140,16 +141,16 @@ export function HoldingForm({id} : {id: string | null}) {
       }
     }
     try {
-      const pathname = usePathname();
       const portfolioid = pathname.substring(pathname.lastIndexOf('/') + 1);
       values.portfolio_id = portfolioid
-      const response = await addHolding(values)
+      const response = await addExistingHolding(values)
       toast({
         title: response[0],
         description: response[1]
       })
     } catch (error) {
       toast({title: "Error submitting form"})
+      console.log(error)
     }
   }
 

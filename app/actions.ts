@@ -209,6 +209,31 @@ export const addHolding = async(values: HoldingFormValues) => {
   return ["Success", "Holding added successfully"]
 }
 
+export const addExistingHolding = async(values: HoldingFormValues) => {
+  const supabase = await createClient();
+
+  const { data, error } = await supabase
+    .from('holdings')
+    .upsert({
+      symbol: values.symbol,
+      portfolio_id: values.portfolio_id,
+      purchase_price: values.price,
+      shares_owned: values.shares,
+      date: values.date
+    }, {
+      onConflict: 'symbol,portfolio_id'
+    })
+    .select();
+
+  if (error) {
+    console.error(error);
+    return ["Error", "Something went wrong"];
+  }
+
+  return ["Success", "Holding added successfully"];
+}
+
+
 export const addShortHolding = async(values: HoldingFormValues) => {
   const supabase = await createClient();
   const purchasePrice = values.price ?? (await getCurrentPrice(values.symbol)) * values.shares;
