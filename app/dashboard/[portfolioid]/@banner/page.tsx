@@ -93,8 +93,8 @@ export default function Page () {
                 </CommandItem>
                 </Link>
                 <div className="flex items-center gap-2">
-                <EditPortfolio id={portfolio.id} />
-                <DeletePortfolio id={portfolio.id} />
+                {isAdmin && <EditPortfolio id={portfolio.id} />}
+                {isAdmin && <DeletePortfolio id={portfolio.id} />}
                 </div>
                 </span>
               ))}
@@ -104,7 +104,7 @@ export default function Page () {
         </Command>
       </PopoverContent>
     </Popover>
-    <CreatePortfolio />
+    {isAdmin && <CreatePortfolio />}
     </div>
             <div className="flex items-center gap-2">
             {isAdmin && <CreateHoldingTerminal />}
