@@ -11,6 +11,7 @@ import { Skeleton } from './ui/skeleton';
 import { Label } from './ui/label';
 import { Separator } from './ui/separator';
 import { usePathname } from 'next/navigation';
+import { checkUUID } from '@/app/actions';
 
 type SelectedItem = {
   name: string;
@@ -27,6 +28,7 @@ type SelectedItem = {
 export default function MainDashboard() {
   const [holdingsData, setHoldingsData] = useState<TreeLeaf[] | null>(null);
   const [selectedItem, setSelectedItem] = useState<SelectedItem>(null);
+  const [isAdmin, setIsAdmin] = useState(false);
 
   const pathname = usePathname();
   const portfolioid = pathname.substring(pathname.lastIndexOf('/') + 1);
@@ -39,6 +41,13 @@ useEffect(() => {
   };
   fetchHoldings();
 }, [portfolioid]);
+
+useEffect(() => {
+  async function setAdminStatus() {
+    setIsAdmin(!(await checkUUID()));
+  }
+  setAdminStatus();
+})
 
   const handleItemClick = (item: SelectedItem) => {
     setSelectedItem(item);
@@ -78,8 +87,8 @@ useEffect(() => {
     </CardTitle>
     {selectedItem && (
       <div className="inline-flex items-center gap-2 shrink-0 ml-2">
-        <EditHolding id={selectedItem.id} />
-        <DeleteHolding id={selectedItem.id}/>
+        {isAdmin && <EditHolding id={selectedItem.id} />}
+        {isAdmin && <DeleteHolding id={selectedItem.id}/>}
       </div>
     )}
   </div>

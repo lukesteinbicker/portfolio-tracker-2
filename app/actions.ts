@@ -5,8 +5,24 @@ import { createClient } from "@/utils/supabase/server";
 import { redirect } from "next/navigation";
 import dayjs from "dayjs";
 
+export const checkUUID = async() => {
+  const supabase = await createClient();
+  const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+
+  if (!session || sessionError)
+      return true;
+
+  const { data: {user}, error} = await supabase.auth.getUser();
+  if (user) {
+    return user.id == process.env.VIEWER_UUID;
+  }
+  else {
+    return false;
+  }
+}
+
 export const signInAction = async (formData: FormData) => {
-  const email = process.env.EMAIL!
+  const email = formData.get("adminUser") ? "lukesteinbicker@gmail.com" : "miiportfoliouva@gmail.com";
   const password = formData.get("password") as string;
   const supabase = await createClient();
 

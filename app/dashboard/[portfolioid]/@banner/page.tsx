@@ -24,6 +24,7 @@ import { CreatePortfolio } from "@/components/create-portfolio";
 import { DeletePortfolio } from "@/components/delete-portfolio";
 import { EditPortfolio } from "@/components/edit-portfolio";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { checkUUID } from "@/app/actions";
 
 interface PortfolioFormValues {
     id: string;
@@ -35,6 +36,7 @@ export default function Page () {
     const [open, setOpen] = useState(false)
     const [value, setValue] = useState("")
     const [portfoliosData, setPortfoliosData] = useState<PortfolioFormValues[] | null>()
+    const [isAdmin, setIsAdmin] = useState(false);
 
     useEffect(() => {
         const fetchPortfolios = async () => {
@@ -44,6 +46,13 @@ export default function Page () {
         };
         fetchPortfolios();
       }, []);
+
+    useEffect(() => {
+      async function setAdminStatus() {
+        setIsAdmin(!(await checkUUID()));
+      }
+      setAdminStatus();
+    }, []);
 
 
     return (
@@ -98,8 +107,8 @@ export default function Page () {
     <CreatePortfolio />
     </div>
             <div className="flex items-center gap-2">
-            <CreateHoldingTerminal />
-            <CreateHolding />
+            {isAdmin && <CreateHoldingTerminal />}
+            {isAdmin && <CreateHolding />}
             </div>
     </>
     )

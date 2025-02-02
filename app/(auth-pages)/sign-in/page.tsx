@@ -3,6 +3,7 @@ import { FormMessage, Message } from "@/components/form-message";
 import { SubmitButton } from "@/components/submit-button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Checkbox } from "@/components/ui/checkbox";
 
 export default async function Login(props: { searchParams: Promise<Message> }) {
   const searchParams = await props.searchParams;
@@ -17,6 +18,16 @@ export default async function Login(props: { searchParams: Promise<Message> }) {
           placeholder="Club password"
           required
         />
+        <div className="flex items-center space-x-2">
+          <Checkbox id="adminUser" name="adminUser"/>
+            <label
+              htmlFor="adminUser"
+              className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+            >
+          Sign in as administrator
+        </label>
+        </div>
+
         <SubmitButton pendingText="Signing In..." formAction={signInAction}>
           Sign in
         </SubmitButton>
