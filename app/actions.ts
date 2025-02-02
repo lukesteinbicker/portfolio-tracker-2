@@ -14,7 +14,7 @@ export const checkUUID = async() => {
 
   const { data: {user}, error} = await supabase.auth.getUser();
   if (user) {
-    return user.id == process.env.VIEWER_UUID;
+    return user.id == "e5f41ed8-5ee4-4811-9a41-0d602565b85b";
   }
   else {
     return false;
